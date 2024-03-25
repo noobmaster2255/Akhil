@@ -1,0 +1,114 @@
+:root {
+    --bg: #fff;
+    --text: #382b22;
+    --light-pink: #fff0f0;
+    --pink: #ffe9e9;
+    --dark-pink: #f9c4d2;
+    --pink-border: #b18597;
+    --pink-shadow: #ffe3e2;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+
+/* progress bar  */
+#progressContainer {
+    width: 50%;
+    height: 3em;
+    background-color: #fef1d1;
+}
+
+#progressBar {
+    width: 1%;
+    height: 3em;
+    background-color: #522f14;
+    text-align: center;
+    font-size: 1em;
+    font-weight: 900;
+    line-height: 3em;
+    color: #fef1d1;
+}
+
+/*  */
+body {
+    width: 100%;
+    height: 100%;
+    background-image: url(/Akhil/assets/bg1.jpg);
+    object-fit: cover;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    box-shadow: inset 0 0 0 1.5em #4f1501, inset 0 0 0 2em #eac288;
+}
+
+.container {
+    padding: 2%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.start-button-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.start-button-container button {
+    font-size: 3em;
+}
+
+button {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    outline: none;
+    border: 0;
+    vertical-align: middle;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 800;
+    color: var(--text);
+    padding: 0.7em 1.5em;
+    background: #fef1d1;
+    border: 3px solid #fef1d1;
+    border-radius: 0.75em;
+    transform-style: preserve-3d;
+    transition: transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1);
+
+}
+
+button::before {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #522f14;
+    border-radius: inherit;
+    box-shadow: 0 5px 12px 0px #703a14;
+    transform: translate3d(0, 0.3em, -1em);
+    transition: transform 150ms cubic-bezier(0, 0, 0.58, 1), box-shadow 150ms cubic-bezier(0, 0, 0.58, 1);
+
+}
+
+button:hover {
+    background: #eac288;
+    transform: translate(0, 0.25em);
+}
+
+button:hover::before {
+    box-shadow: 0 5px 12px 0px #703a14;
+    transform: translate3d(0, 0.1em, -1em);
+}
