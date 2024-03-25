@@ -35,6 +35,7 @@ if (currentPage == "/Akhil/index.html") {
   startButton.addEventListener("click", function () {
     startButtonDiv.style.display = "none";
     load().then(() => {});
+    
   });
 }
 
