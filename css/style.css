@@ -1,18 +1,11 @@
-:root {
-    --bg: #fff;
-    --text: #382b22;
-    --light-pink: #fff0f0;
-    --pink: #ffe9e9;
-    --dark-pink: #f9c4d2;
-    --pink-border: #b18597;
-    --pink-shadow: #ffe3e2;
-}
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: "Poppins", sans-serif;
+    color: #522f14;
+    transition: all 0.5s ease;
 }
 
 
@@ -55,15 +48,34 @@ body {
     height: 100vh;
 }
 
-.start-button-container {
+#backButtonContainer{
+    bottom: 0;
+    right: 0;
+    margin-bottom: 4em;
+    margin-right: 4em;
+    position: absolute;
+}
+
+#backButtonContainer button{
+    font-size: 1.5em;
+}
+.button-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.start-button-container button {
+.button-container button {
     font-size: 3em;
+    margin-bottom: 1em;
+}
+
+.team button{
+    max-width: 45vw;
+    width: 100%;
+    height: auto;
+    font-size: 2em;
 }
 
 button {
@@ -76,7 +88,7 @@ button {
     font-family: inherit;
     font-size: inherit;
     font-weight: 800;
-    color: var(--text);
+    color: #522f14;
     padding: 0.7em 1.5em;
     background: #fef1d1;
     border: 3px solid #fef1d1;
