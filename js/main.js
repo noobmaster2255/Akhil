@@ -27,7 +27,7 @@ xhrWeapons.onreadystatechange = function () {
   if (xhrWeapons.readyState === 4) {
     if (xhrWeapons.status === 200) {
       const data = JSON.parse(xhrWeapons.responseText);
-      weapons = data.slice(0, 50);
+      weapons = data;
     } else {
       console.error("Request failed with status:", xhrWeapons.status);
     }
@@ -69,6 +69,7 @@ function goBack() {
 if (startButton) {
   startButton.addEventListener("click", startGame);
 }
+
 function startGame() {
   startButtonDiv.style.display = "none";
   load()
@@ -117,7 +118,7 @@ function selectTeamButton(containerId) {
 let agentsContainer;
 if (currentPage == "/Akhil/agents.html") {
   agentsContainer = document.getElementById("agentsContainer");
-  document.body.style.backgroundImage = 'url("/Akhil/assets/bg2.jpg")';
+  // document.body.style.backgroundImage = 'url("/Akhil/assets/bg2.jpg")';
   let selectedTeamId = localStorage.getItem("selectedTeam");
   selectedTeam(selectedTeamId);
 }
@@ -164,39 +165,208 @@ function displayAgents(filteredAgents) {
 }
 
 let characterInfo = {};
-function saveCharacterName() {
-  let characterNameInput = document.getElementById("characterName");
-  let characterName = characterNameInput.value.trim();
-
-  if (characterName === "") {
-    alert("Name should not be empty");
-    return false;
-  }
-  if (characterName.split(" ").length > 2) {
-    alert("Name should not be more than 2 words");
-    return false;
-  }
-  if (characterName.length > 20) {
-    alert("Name should not be more than 20 characters");
-    return false;
-  }
-
-  agentId = activeTile ? activeTile.id : null;
-  if (agentId && characterName) {
-    characterInfo = {
-      agentId: agentId,
-      characterName: characterName,
-    };
-  } else {
-    alert("Select a character and type name");
-  }
+let saveCharacter = document.getElementById("saveCharacter");
+if (saveCharacter) {
+  saveCharacter.addEventListener("click", () => {
+    saveCharacterName()
+      .then(() => {
+        load()
+          .then(() => {
+            setTimeout(() => {
+              window.location.href =
+                "weapons.html?characterName=" +
+                characterInfo.characterName +
+                "&agentId=" +
+                characterInfo.agentId;
+            }, 1000);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
 }
 
-console.log(characterInfo);
+function saveCharacterName() {
+  return new Promise((resolve, reject) => {
+    let characterNameInput = document.getElementById("characterName");
+    let characterName = characterNameInput.value.trim();
+
+    if (characterName === "") {
+      alert("Name should not be empty");
+      reject("Name should not be empty");
+    } else if (characterName.split(" ").length > 2) {
+      alert("Name should not be more than 2 words");
+      reject("Name should not be more than 2 words");
+    } else if (characterName.length > 20) {
+      alert("Name should not be more than 20 characters");
+      reject("Name should not be more than 20 characters");
+    } else {
+      agentId = activeTile ? activeTile.id : null;
+      if (agentId !== null && characterName !== "") {
+        characterInfo = {
+          agentId: agentId,
+          characterName: characterName,
+        };
+        resolve(characterInfo);
+      } else {
+        alert("Select a character and type name");
+        // reject("Select a character and type name");
+      }
+    }
+  });
+}
+
+if (currentPage == "/Akhil/weapons.html") {
+  listWeapons();
+}
+function listWeapons() {
+  let urlParams = new URLSearchParams(window.location.search);
+  const agentId = urlParams.get("agentId");
+  const characterName = urlParams.get("characterName");
+  weaponCategory();
+  weaponName();
+  weaponSkin();
+  let weaponsContainer = document.getElementById("weaponsContainer");
+}
+
+function weaponCategory() {
+  let weaponCat = document.getElementById("weaponCat");
+  let weaponCategory = [];
+  weapons.forEach((weapon) => {
+    if (!weaponCategory.includes(weapon.category.name)) {
+      weaponCategory.push(weapon.category.name);
+    }
+  });
+  weaponCategory.forEach((category) => {
+    if (category) {
+      let categoryTile = document.createElement("div");
+      categoryTile.setAttribute("class", "category-tile agent-tile");
+      categoryTile.setAttribute("id", category);
+      categoryTile.textContent = category;
+      weaponCat.appendChild(categoryTile);
+    }
+  });
+}
+
+function weaponName() {
+  let weaponNameContainer = document.getElementById("weaponNameContainer");
+  let weaponNames = [];
+  weapons.forEach((weapon) => {
+    const name = weapon.weapon.name;
+    if (!weaponNames.includes(name)) {
+      if (
+        name === "Dual Berettas" ||
+        name === "Five-SeveN" ||
+        name === "Glock-18"
+      ) {
+        weaponNames.push(name);
+      }
+    }
+  });
+
+  weaponNames.forEach((name) => {
+    if (name) {
+      let weaponNameTile = document.createElement("div");
+      weaponNameTile.setAttribute("class", "weapon-name-tile agent-tile");
+      weaponNameTile.setAttribute("id", name);
+      weaponNameTile.textContent = name;
+      weaponNameContainer.appendChild(weaponNameTile);
+    }
+  });
+}
+
+function weaponSkin() {
+  let weaponSkin = [];
+  let weaponsContainer = document.getElementById("weaponsContainer");
+
+  weapons.forEach((weapon) => {
+    const skin = weapon.name;
+    const split = skin.split("|");
+    const skinName = split[1];
+    const skinId = weapon.id;
+    const skinImg = weapon.image;
+    if (!weaponSkin.map((skinObj) => skinObj.skinName).includes(skinName)) {
+      weaponSkin.push({ skinName: skinName, skinId: skinId, skinImg: skinImg });
+    }
+    //&& weaponSkin.length < 500
+  });
+  weaponSkin.forEach((element) => {
+    let weaponTile = document.createElement("weaponTile");
+    weaponTile.setAttribute("class", "weapon-tile agent-tile");
+    let weaponImage = document.createElement("img");
+    weaponImage.id = element.skinId;
+    weaponImage.src = element.skinImg;
+
+    let weaponAlias = document.createElement("p");
+    weaponAlias.id = `alia-${element.skinId}`;
+    weaponAlias.textContent = element.skinName;
+
+    weaponTile.appendChild(weaponImage);
+    weaponTile.appendChild(weaponAlias);
+    weaponsContainer.appendChild(weaponTile);
+  });
+}
+
+//filter weapons
+
+function filterByCategory(category) {
+  const filteredWeapons = weapons.filter(
+    (weapon) => weapon.category.name === category
+  );
+  displayFilteredWeapons(filteredWeapons);
+}
+
+function filterByName(name) {
+  const filteredWeapons = weapons.filter(
+    (weapon) => weapon.weapon.name === name
+  );
+  displayFilteredWeapons(filteredWeapons);
+}
+
+function displayFilteredWeapons(filteredWeapons) {
+  let weaponsContainer = document.getElementById("weaponsContainer");
+  weaponsContainer.innerHTML = "";
+
+  filteredWeapons.forEach((weapon) => {
+    const skin = weapon.name;
+    const split = skin.split("|");
+    const skinName = split[1];
+    const skinId = weapon.id;
+    const skinImg = weapon.image;
+    let weaponTile = document.createElement("weaponTile");
+    weaponTile.setAttribute("class", "weapon-tile agent-tile");
+    let weaponImage = document.createElement("img");
+    weaponImage.id = skinId;
+    weaponImage.src = skinImg;
+
+    let weaponAlias = document.createElement("p");
+    weaponAlias.id = `alia-${skinId}`;
+    weaponAlias.textContent = skinName;
+
+    weaponTile.appendChild(weaponImage);
+    weaponTile.appendChild(weaponAlias);
+    weaponsContainer.appendChild(weaponTile);
+  });
+}
+
+document.querySelectorAll(".category-tile").forEach((categoryTile) => {
+  categoryTile.addEventListener("click", () => {
+    const category = categoryTile.textContent;
+    filterByCategory(category);
+  });
+});
 
 
-
-
+document.querySelectorAll(".weapon-name-tile").forEach((nameTile) => {
+  nameTile.addEventListener("click", ()=>{
+    const name = nameTile.textContent;
+    filterByName(name);
+  })
+})
 // function for progress load
 function load() {
   return new Promise((resolve, reject) => {
