@@ -7,13 +7,16 @@ let agents = [];
 const weaponURL = "https://bymykel.github.io/CSGO-API/api/en/skins.json";
 let weapons = [];
 
+let balance = 9000;
+
 const xhrAgents = new XMLHttpRequest();
 xhrAgents.open("GET", agentURL, false);
 xhrAgents.onreadystatechange = function () {
   if (xhrAgents.readyState === 4) {
     if (xhrAgents.status === 200) {
       const data = JSON.parse(xhrAgents.responseText);
-      agents = data.slice(0, 50);
+      agents = data;
+      // agents = data.slice(0, 500);
     } else {
       console.error("Request failed with status:", xhrAgents.status);
     }
@@ -102,7 +105,6 @@ function selectTeamButton(containerId) {
       load()
         .then(() => {
           localStorage.setItem("lastClickedButtonId", button.id);
-          localStorage.setItem("selectedTeam", button.id);
           setTimeout(() => {
             window.location.href = "agents.html";
           }, 1000);
@@ -118,8 +120,7 @@ function selectTeamButton(containerId) {
 let agentsContainer;
 if (currentPage == "/Akhil/agents.html") {
   agentsContainer = document.getElementById("agentsContainer");
-  // document.body.style.backgroundImage = 'url("/Akhil/assets/bg2.jpg")';
-  let selectedTeamId = localStorage.getItem("selectedTeam");
+  let selectedTeamId = localStorage.getItem("lastClickedButtonId");
   selectedTeam(selectedTeamId);
 }
 function selectedTeam(team) {
@@ -133,6 +134,7 @@ function selectedTeam(team) {
   });
   let agentHeading = document.getElementById("agentHeading");
   agentHeading.innerHTML = `Choose an Agent : ${team}`;
+  localStorage.setItem("selectedTeam", team);
   displayAgents(filteredAgents);
 }
 
@@ -211,6 +213,8 @@ function saveCharacterName() {
           agentId: agentId,
           characterName: characterName,
         };
+        localStorage.setItem("characterName", characterName);
+        localStorage.setItem("agentId", agentId);
         resolve(characterInfo);
       } else {
         alert("Select a character and type name");
@@ -221,6 +225,8 @@ function saveCharacterName() {
 }
 
 if (currentPage == "/Akhil/weapons.html") {
+  let displyBalance = document.getElementById("displyBalance");
+  displyBalance.textContent = balance;
   listWeapons();
 }
 function listWeapons() {
@@ -290,13 +296,20 @@ function weaponSkin() {
     const skinId = weapon.id;
     const skinImg = weapon.image;
     if (!weaponSkin.map((skinObj) => skinObj.skinName).includes(skinName)) {
-      weaponSkin.push({ skinName: skinName, skinId: skinId, skinImg: skinImg });
+      weaponSkin.push({
+        skinName: skinName,
+        skinId: skinId,
+        skinImg: skinImg,
+        skinCategory: weapon.category.name,
+      });
     }
     //&& weaponSkin.length < 500
   });
   weaponSkin.forEach((element) => {
     let weaponTile = document.createElement("weaponTile");
     weaponTile.setAttribute("class", "weapon-tile agent-tile");
+    weaponTile.setAttribute("id", element.skinId);
+    weaponTile.setAttribute("name", element.skinCategory);
     let weaponImage = document.createElement("img");
     weaponImage.id = element.skinId;
     weaponImage.src = element.skinImg;
@@ -339,6 +352,14 @@ function displayFilteredWeapons(filteredWeapons) {
     const skinImg = weapon.image;
     let weaponTile = document.createElement("weaponTile");
     weaponTile.setAttribute("class", "weapon-tile agent-tile");
+    weaponTile.setAttribute("name", weapon.category.name);
+    let weaponType = weaponTile.getAttribute("name");
+
+    weaponTile.addEventListener("click", () => {
+      selectWeapons(skinId);
+      reducePriceFromBalance(weaponType);
+    });
+
     let weaponImage = document.createElement("img");
     weaponImage.id = skinId;
     weaponImage.src = skinImg;
@@ -360,13 +381,101 @@ document.querySelectorAll(".category-tile").forEach((categoryTile) => {
   });
 });
 
-
 document.querySelectorAll(".weapon-name-tile").forEach((nameTile) => {
-  nameTile.addEventListener("click", ()=>{
+  nameTile.addEventListener("click", () => {
     const name = nameTile.textContent;
     filterByName(name);
-  })
-})
+  });
+});
+
+/*
+
+/////////selected weapons //////////
+
+*/
+
+let selectedWeaponIds = [];
+
+function selectWeapons(weaponTile) {
+  let weaponId = weaponTile.id;
+  let weaponType = weaponTile.getAttribute("name");
+  const index = selectedWeaponIds.indexOf(weaponId);
+
+  if (index !== -1) {
+    selectedWeaponIds.splice(index, 1);
+    weaponTile.classList.remove("active");
+    return;
+  } else {
+    if (selectedWeaponIds.length >= 6) {
+      alert("You can select up to 6 weapons.");
+      return;
+    }
+    reducePriceFromBalance(weaponType);
+    selectedWeaponIds.push(weaponId);
+    weaponTile.classList.add("active");
+  }
+
+  localStorage.setItem("selectedWeaponIds", JSON.stringify(selectedWeaponIds));
+}
+
+document.querySelectorAll(".weapon-tile").forEach((weaponTile) => {
+  weaponTile.addEventListener("click", () => {
+    selectWeapons(weaponTile);
+  });
+});
+
+/*
+
+////////// find balance ///////////
+
+*/
+
+const weaponPrices = {
+  Pistols: randomPrice(200, 700),
+  SMGs: randomPrice(1000, 1500),
+  Rifles: randomPrice(1500, 3500),
+  Heavy: randomPrice(2500, 4500),
+  Knives: randomPrice(100, 500),
+  Gloves: randomPrice(100, 500),
+};
+
+function randomPrice(min, max) {
+  const range = Math.floor((max - min) / 50);
+  console.log(range);
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function reducePriceFromBalance(weaponType) {
+  let price = weaponPrices[weaponType];
+  if (balance >= price) {
+    balance = balance - price;
+  } else {
+    alert("insufficient balance to purchase", weaponType);
+  }
+  let displyBalance = document.getElementById("displyBalance");
+  displyBalance.textContent = balance;
+  localStorage.setItem("balance", balance);
+  return balance;
+}
+
+//adding continue navigation button
+let continueButtonContainer = document.getElementById(
+  "continueButtonContainer"
+);
+let continueButton = document.createElement("BUTTON");
+continueButton.setAttribute("id", "continueButton");
+continueButton.setAttribute("class", "continue-button");
+continueButton.innerHTML = "Continue";
+continueButtonContainer.appendChild(continueButton);
+
+function continueToNextPage(page) {
+  load().then(() => {
+    setTimeout(() => {
+      window.location.href = page;
+    }, 1000);
+  });
+}
+
 // function for progress load
 function load() {
   return new Promise((resolve, reject) => {
@@ -388,3 +497,5 @@ function load() {
     }
   });
 }
+
+console.log(localStorage);

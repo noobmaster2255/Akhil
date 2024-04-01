@@ -21,18 +21,18 @@
     <header>
     </header>
     <section class="container" id="container">
-        <p class="balance-p">Balance: <span class="balance-span" id="displyBalance"></span></p>
-        <div class="weapon-name-container" id="weaponNameContainer"></div>
+        <div class="agent-heading" id="">
+            <p id="agentHeading"></p>
         </div>
-        <div class="skin-weapon-container">
-            <div class="weapon-category" id="weaponCat">
-            </div>
-            <div class="agents-conatiner weapons-conatiner" id="weaponsContainer">
-            </div>
+        <div class="agents-conatiner" id="agentsContainer">
         </div>
         <div class="bottom-row">
+            <div class="character-name">
+                <label>Team Name:</label>
+                <input type="text" placeholder="Enter name" id="characterName">
+                <button id="saveCharacter" onclick="saveCharacterName()">Save</button>
+            </div>
             <div class="button-container back-nav" id="backButtonContainer" style="display: flex;"></div>
-            <div class="continue-container back-nav" onclick="continueToNextPage('overview.html')" id="continueButtonContainer" style="display: flex;"></div>
         </div>
     </section>
     <script src="js/main.js"></script>

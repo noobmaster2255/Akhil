@@ -292,11 +292,12 @@ input[type=text]:focus {
     align-items: center;
 }
 
-.weapons-conatiner{
+.weapons-conatiner {
     border: 0.2em solid #eac288;
     column-gap: 1em;
     overflow-x: clip;
 }
+
 .skin-weapon-container {
     margin: 0;
     padding: 0;
@@ -354,7 +355,7 @@ input[type=text]:focus {
     flex-direction: row;
     justify-content: left;
     align-items: flex-end;
-    width: 80%;
+    width: 76%;
     margin: 0;
     padding: 0;
     margin-bottom: 2em;
@@ -366,4 +367,48 @@ input[type=text]:focus {
     margin-left: 4em;
     width: 12vw;
     height: 8vh;
+}
+
+.balance-p {
+    font-size: 1.4em;
+    font-weight: 600;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-left: 2em;
+    margin-top: 1.5em;
+    background-color: #4f1501;
+    padding: 0.5em 0.7em;
+    border-radius: 0.3em;
+    border: 2px solid #eac288;
+}
+
+.balance-p,
+.balance-span {
+    color: #fef1d1;
+}
+
+
+#continueButtonContainer {
+    bottom: 0;
+    right: 0;
+    margin-bottom: 2em;
+    margin-right: 4em;
+    position: absolute;
+}
+
+#continueButtonContainer button {
+    font-size: 1.2em;
+}
+
+.continue-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.continue-container button {
+    font-size: 2em;
+    margin-bottom: 1em;
 }
