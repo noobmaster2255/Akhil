@@ -353,10 +353,11 @@ function displayFilteredWeapons(filteredWeapons) {
     let weaponTile = document.createElement("weaponTile");
     weaponTile.setAttribute("class", "weapon-tile agent-tile");
     weaponTile.setAttribute("name", weapon.category.name);
+    weaponTile.setAttribute("id", weapon.id);
     let weaponType = weaponTile.getAttribute("name");
 
     weaponTile.addEventListener("click", () => {
-      selectWeapons(skinId);
+      selectWeapons(weaponTile);
       reducePriceFromBalance(weaponType);
     });
 
@@ -399,7 +400,16 @@ let selectedWeaponIds = [];
 function selectWeapons(weaponTile) {
   let weaponId = weaponTile.id;
   let weaponType = weaponTile.getAttribute("name");
-  const index = selectedWeaponIds.indexOf(weaponId);
+  const index = selectedWeaponIds.findIndex((item) => item.id === weaponId);
+
+  let categorySelected = selectedWeaponIds.some((item) => {
+    return item.type === weaponType;
+  });
+
+  if (categorySelected) {
+    alert("You can select only one weapon from each category");
+    return;
+  }
 
   if (index !== -1) {
     selectedWeaponIds.splice(index, 1);
@@ -410,8 +420,9 @@ function selectWeapons(weaponTile) {
       alert("You can select up to 6 weapons.");
       return;
     }
+
     reducePriceFromBalance(weaponType);
-    selectedWeaponIds.push(weaponId);
+    selectedWeaponIds.push({ id: weaponId, type: weaponType });
     weaponTile.classList.add("active");
   }
 
@@ -441,7 +452,6 @@ const weaponPrices = {
 
 function randomPrice(min, max) {
   const range = Math.floor((max - min) / 50);
-  console.log(range);
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
@@ -475,6 +485,104 @@ function continueToNextPage(page) {
     }, 1000);
   });
 }
+
+let characterNameHeading = document.getElementById("characterNameHeading");
+characterNameHeading.textContent = localStorage.getItem("characterName");
+
+let characterContainer = document.getElementById("characterContainer");
+let myCharacter = localStorage.getItem("agentId");
+
+agents.forEach((agent) => {
+  if (agent.id == myCharacter) {
+    let myCharacterTile = document.createElement("div");
+    myCharacterTile.setAttribute("id", "myCharacterTile");
+    myCharacterTile.setAttribute("class", "character-tile agent-tile");
+
+    let charcterImgTag = document.createElement("img");
+    charcterImgTag.setAttribute("src", agent.image);
+
+    let characterPTag = document.createElement("p");
+    characterPTag.textContent = agent.name;
+
+    myCharacterTile.appendChild(charcterImgTag);
+    myCharacterTile.appendChild(characterPTag);
+    characterContainer.appendChild(myCharacterTile);
+  }
+});
+
+let weaponOverviewContainer = document.getElementById(
+  "weaponOverviewContainer"
+);
+let myWeapons = localStorage.getItem("selectedWeaponIds");
+myWeapons = JSON.parse(myWeapons);
+
+let listMyWeapons = weapons.filter((weapon) =>
+  myWeapons.some((item) => item.id === weapon.id)
+);
+
+listMyWeapons.forEach((weapon) => {
+  let weaponTile = document.createElement("weaponTile");
+  weaponTile.setAttribute("class", "weapon-tile agent-tile my-weapon-tile");
+  weaponTile.setAttribute("id", weapon.id);
+  weaponTile.setAttribute("name", weapon.category.name);
+  let weaponImage = document.createElement("img");
+  weaponImage.setAttribute("class", "my-weapon-img");
+  weaponImage.id = weapon.id;
+  weaponImage.src = weapon.image;
+
+  weaponTile.appendChild(weaponImage);
+  weaponOverviewContainer.appendChild(weaponTile);
+});
+
+document.body.addEventListener("mouseover", (event) => {
+  if (!event.target.classList.contains("my-weapon-tile")) {
+    weaponDetailContainer.style.display = "none";
+  }
+});
+
+let weaponDetailContainer = document.getElementById("weaponDetailContainer");
+document.querySelectorAll(".my-weapon-tile").forEach((weaponTile) => {
+  weaponTile.addEventListener("click", () => {
+    weaponDetailContainer.innerHTML = "";
+    showWeaponDetails(weaponTile);
+    weaponDetailContainer.style.display = "block";
+  });
+});
+
+function showWeaponDetails(weaponTile) {
+  let weaponId = weaponTile.id;
+  let weaponDetails = weapons.find((weapon) => weapon.id == weaponId);
+
+  let weaponCat = weaponDetails.category.name;
+  let weaponName = weaponDetails.weapon.name;
+  let weaponMaxFloat = weaponDetails.max_float;
+  let weaponMinFloat = weaponDetails.min_float;
+  let weaponTeam = weaponDetails.team.name;
+  let weaponRarity = weaponDetails.rarity.name;
+
+  let detailHeading = document.createElement("h2");
+  let p1 = document.createElement("p");
+  let p2 = document.createElement("p");
+  let p3 = document.createElement("p");
+  let p4 = document.createElement("p");
+  let p5 = document.createElement("p");
+
+  detailHeading.textContent = weaponName;
+  p1.innerHTML = `Weapon Category: <b> ${weaponCat}</b>`;
+  p2.innerHTML = `Weapon max float:<b> ${weaponMaxFloat}</b>`;
+  p3.innerHTML = `Weapon min float:<b> ${weaponMinFloat}</b>`;
+  p4.innerHTML = `Weapon Team:<b> ${weaponTeam}</b>`;
+  p5.innerHTML = `Weapon Team:<b> ${weaponRarity}</b>`;
+
+  weaponDetailContainer.appendChild(detailHeading);
+  weaponDetailContainer.appendChild(p1);
+  weaponDetailContainer.appendChild(p2);
+  weaponDetailContainer.appendChild(p3);
+  weaponDetailContainer.appendChild(p4);
+  weaponDetailContainer.appendChild(p5);
+}
+
+console.log(listMyWeapons);
 
 // function for progress load
 function load() {

@@ -28,7 +28,11 @@
 
 /*  */
 body {
-    background-image: url(/Akhil/assets/csgo2.jpg), url(/Akhil/assets/bg2.jpg);
+    /* background-image: url(/Akhil/assets/csgo2.jpg), url(/Akhil/assets/bg2.jpg); */
+    /* background-image: url(/Akhil/assets/bg2.jpg); */
+    background-image: url(/Akhil/assets/bg1.jpg);
+    /* background-image: url(/Akhil/assets/csgo1.jpg); */
+
     object-fit: cover;
     background-repeat: no-repeat;
     background-size: cover;
@@ -411,4 +415,74 @@ input[type=text]:focus {
 .continue-container button {
     font-size: 2em;
     margin-bottom: 1em;
+}
+
+.character-name-heading {
+    width: 30%;
+    border: 0.1em solid #522f14;
+}
+
+.character-name-heading p {
+    text-transform: capitalize;
+    font-weight: 600;
+    font-size: 1.5em;
+}
+
+.overview-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content:left;
+    align-items: flex-start;
+}
+
+.character-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 25%;
+    justify-content: flex-start;
+}
+
+.character-container .character-tile {
+    margin-left: 9em;
+    width: 70%;
+    height: auto;
+}
+
+.character-container .character-tile p {
+    font-size: 0.8em;
+}
+
+.character-container .character-tile img {
+    width: 90%;
+    height: auto;
+    border-width: 0.3em;
+}
+
+.weapon-overview-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 1em;
+    margin-left: 8em;
+}
+
+.weapon-overview-container .weapon-tile {
+
+    width: 8vw;
+    height: 12vh;
+}
+
+.weapon-overview-container .weapon-tile img {
+    width: 100%;
+    height: auto;
+    border-width: 0.15em;
+}
+
+.weapon-details-conatiner{
+    margin-left: 2em;
+    border: 2px solid #4f1501;
+    background-color: #fef1d1;
+    padding: 2em;
+    border-radius: 10px;
 }
