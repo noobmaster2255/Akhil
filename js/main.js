@@ -135,11 +135,13 @@ function selectedTeam(team) {
   let agentHeading = document.getElementById("agentHeading");
   agentHeading.innerHTML = `Choose an Agent : ${team}`;
   localStorage.setItem("selectedTeam", team);
+  localStorage.setItem("filteredAgents", JSON.stringify(filteredAgents));
   displayAgents(filteredAgents);
 }
 
 let activeTile = null;
 let activeTileId = null;
+
 function displayAgents(filteredAgents) {
   filteredAgents.forEach(function (agent) {
     let agentTile = document.createElement("div");
@@ -175,11 +177,7 @@ if (saveCharacter) {
         load()
           .then(() => {
             setTimeout(() => {
-              window.location.href =
-                "weapons.html?characterName=" +
-                characterInfo.characterName +
-                "&agentId=" +
-                characterInfo.agentId;
+              window.location.href = "weapons.html";
             }, 1000);
           })
           .catch((error) => {
@@ -227,17 +225,28 @@ function saveCharacterName() {
 if (currentPage == "/Akhil/weapons.html") {
   let displyBalance = document.getElementById("displyBalance");
   displyBalance.textContent = balance;
-  listWeapons();
-}
-function listWeapons() {
-  let urlParams = new URLSearchParams(window.location.search);
-  const agentId = urlParams.get("agentId");
-  const characterName = urlParams.get("characterName");
   weaponCategory();
   weaponName();
   weaponSkin();
-  let weaponsContainer = document.getElementById("weaponsContainer");
+  //adding continue navigation button
+  let continueButtonContainer = document.getElementById(
+    "continueButtonContainer"
+  );
+  let continueButton = document.createElement("BUTTON");
+  continueButton.setAttribute("id", "continueButton");
+  continueButton.setAttribute("class", "continue-button");
+  continueButton.innerHTML = "Continue";
+  continueButtonContainer.appendChild(continueButton);
 }
+// function listWeapons() {
+//   let urlParams = new URLSearchParams(window.location.search);
+//   const agentId = urlParams.get("agentId");
+//   const characterName = urlParams.get("characterName");
+//   weaponCategory();
+//   weaponName();
+//   weaponSkin();
+//   let weaponsContainer = document.getElementById("weaponsContainer");
+// }
 
 function weaponCategory() {
   let weaponCat = document.getElementById("weaponCat");
@@ -289,7 +298,14 @@ function weaponSkin() {
   let weaponSkin = [];
   let weaponsContainer = document.getElementById("weaponsContainer");
 
-  weapons.forEach((weapon) => {
+  // console.log(weapons.team);
+  let filteredWeapon = weapons.filter(
+    (weapon) =>
+      weapon.team.id == localStorage.getItem("selectedTeam") ||
+      weapon.team.id == "both"
+  );
+
+  filteredWeapon.forEach((weapon) => {
     const skin = weapon.name;
     const split = skin.split("|");
     const skinName = split[1];
@@ -419,13 +435,13 @@ function selectWeapons(weaponTile) {
     if (selectedWeaponIds.length >= 6) {
       alert("You can select up to 6 weapons.");
       return;
+    } else {
+      selectedWeaponIds.push({ id: weaponId, type: weaponType });
+      let type = weaponType;
+      reducePriceFromBalance(type);
+      weaponTile.classList.add("active");
     }
-
-    reducePriceFromBalance(weaponType);
-    selectedWeaponIds.push({ id: weaponId, type: weaponType });
-    weaponTile.classList.add("active");
   }
-
   localStorage.setItem("selectedWeaponIds", JSON.stringify(selectedWeaponIds));
 }
 
@@ -468,16 +484,6 @@ function reducePriceFromBalance(weaponType) {
   return balance;
 }
 
-//adding continue navigation button
-let continueButtonContainer = document.getElementById(
-  "continueButtonContainer"
-);
-let continueButton = document.createElement("BUTTON");
-continueButton.setAttribute("id", "continueButton");
-continueButton.setAttribute("class", "continue-button");
-continueButton.innerHTML = "Continue";
-continueButtonContainer.appendChild(continueButton);
-
 function continueToNextPage(page) {
   load().then(() => {
     setTimeout(() => {
@@ -485,69 +491,70 @@ function continueToNextPage(page) {
     }, 1000);
   });
 }
+if (currentPage == "/Akhil/overview.html") {
+  let characterNameHeading = document.getElementById("characterNameHeading");
+  characterNameHeading.textContent = localStorage.getItem("characterName");
 
-let characterNameHeading = document.getElementById("characterNameHeading");
-characterNameHeading.textContent = localStorage.getItem("characterName");
+  let characterContainer = document.getElementById("characterContainer");
+  let myCharacter = localStorage.getItem("agentId");
 
-let characterContainer = document.getElementById("characterContainer");
-let myCharacter = localStorage.getItem("agentId");
+  agents.forEach((agent) => {
+    if (agent.id == myCharacter) {
+      let myCharacterTile = document.createElement("div");
+      myCharacterTile.setAttribute("id", "myCharacterTile");
+      myCharacterTile.setAttribute("class", "character-tile agent-tile");
 
-agents.forEach((agent) => {
-  if (agent.id == myCharacter) {
-    let myCharacterTile = document.createElement("div");
-    myCharacterTile.setAttribute("id", "myCharacterTile");
-    myCharacterTile.setAttribute("class", "character-tile agent-tile");
+      let charcterImgTag = document.createElement("img");
+      charcterImgTag.setAttribute("src", agent.image);
 
-    let charcterImgTag = document.createElement("img");
-    charcterImgTag.setAttribute("src", agent.image);
+      let characterPTag = document.createElement("p");
+      characterPTag.textContent = agent.name;
 
-    let characterPTag = document.createElement("p");
-    characterPTag.textContent = agent.name;
-
-    myCharacterTile.appendChild(charcterImgTag);
-    myCharacterTile.appendChild(characterPTag);
-    characterContainer.appendChild(myCharacterTile);
-  }
-});
-
-let weaponOverviewContainer = document.getElementById(
-  "weaponOverviewContainer"
-);
-let myWeapons = localStorage.getItem("selectedWeaponIds");
-myWeapons = JSON.parse(myWeapons);
-
-let listMyWeapons = weapons.filter((weapon) =>
-  myWeapons.some((item) => item.id === weapon.id)
-);
-
-listMyWeapons.forEach((weapon) => {
-  let weaponTile = document.createElement("weaponTile");
-  weaponTile.setAttribute("class", "weapon-tile agent-tile my-weapon-tile");
-  weaponTile.setAttribute("id", weapon.id);
-  weaponTile.setAttribute("name", weapon.category.name);
-  let weaponImage = document.createElement("img");
-  weaponImage.setAttribute("class", "my-weapon-img");
-  weaponImage.id = weapon.id;
-  weaponImage.src = weapon.image;
-
-  weaponTile.appendChild(weaponImage);
-  weaponOverviewContainer.appendChild(weaponTile);
-});
-
-document.body.addEventListener("mouseover", (event) => {
-  if (!event.target.classList.contains("my-weapon-tile")) {
-    weaponDetailContainer.style.display = "none";
-  }
-});
-
-let weaponDetailContainer = document.getElementById("weaponDetailContainer");
-document.querySelectorAll(".my-weapon-tile").forEach((weaponTile) => {
-  weaponTile.addEventListener("click", () => {
-    weaponDetailContainer.innerHTML = "";
-    showWeaponDetails(weaponTile);
-    weaponDetailContainer.style.display = "block";
+      myCharacterTile.appendChild(charcterImgTag);
+      // myCharacterTile.appendChild(characterPTag);
+      characterContainer.appendChild(myCharacterTile);
+    }
   });
-});
+
+  let weaponOverviewContainer = document.getElementById(
+    "weaponOverviewContainer"
+  );
+  let myWeapons = localStorage.getItem("selectedWeaponIds");
+  myWeapons = JSON.parse(myWeapons);
+
+  let listMyWeapons = weapons.filter((weapon) =>
+    myWeapons.some((item) => item.id === weapon.id)
+  );
+
+  listMyWeapons.forEach((weapon) => {
+    let weaponTile = document.createElement("weaponTile");
+    weaponTile.setAttribute("class", "weapon-tile agent-tile my-weapon-tile");
+    weaponTile.setAttribute("id", weapon.id);
+    weaponTile.setAttribute("name", weapon.category.name);
+    let weaponImage = document.createElement("img");
+    weaponImage.setAttribute("class", "my-weapon-img");
+    weaponImage.id = weapon.id;
+    weaponImage.src = weapon.image;
+
+    weaponTile.appendChild(weaponImage);
+    weaponOverviewContainer.appendChild(weaponTile);
+  });
+
+  document.body.addEventListener("mouseover", (event) => {
+    if (!event.target.classList.contains("my-weapon-tile")) {
+      weaponDetailContainer.style.display = "none";
+    }
+  });
+
+  let weaponDetailContainer = document.getElementById("weaponDetailContainer");
+  document.querySelectorAll(".my-weapon-tile").forEach((weaponTile) => {
+    weaponTile.addEventListener("click", () => {
+      weaponDetailContainer.innerHTML = "";
+      weaponDetailContainer.style.display = "block";
+      showWeaponDetails(weaponTile);
+    });
+  });
+}
 
 function showWeaponDetails(weaponTile) {
   let weaponId = weaponTile.id;
@@ -582,7 +589,58 @@ function showWeaponDetails(weaponTile) {
   weaponDetailContainer.appendChild(p5);
 }
 
-console.log(listMyWeapons);
+function createTeam() {
+  let inputCharacterName = document.getElementById("inputCharacterName");
+  if (inputCharacterName.value === "") {
+    alert("Enter team name");
+  } else {
+    localStorage.setItem("teamName", inputCharacterName.value);
+    load().then(() => {
+      setTimeout(() => {
+        window.location.href = "teamOverview.html";
+      }, 1000);
+    });
+  }
+}
+
+const randomAgents = [];
+let filteredAgents = JSON.parse(localStorage.getItem("filteredAgents"));
+const numAgents = filteredAgents.length;
+
+while (randomAgents.length < 3) {
+  let randomIndex = Math.floor(Math.random() * numAgents);
+  let randomAgent = filteredAgents[randomIndex];
+
+  if (!randomAgents.includes(randomAgent)) {
+    randomAgents.push(randomAgent);
+  }
+}
+let myAgent = agents.find(
+  (agent) => agent.id === localStorage.getItem("agentId")
+);
+myAgent.name = localStorage.getItem("characterName");
+randomAgents.push(myAgent);
+
+if (currentPage == "/Akhil/teamOverview.html") {
+  let teamContainer = document.getElementById("characterContainer");
+  let characterNameHeading = document.getElementById("characterNameHeading");
+  characterNameHeading.textContent = localStorage.getItem("teamName");
+  randomAgents.forEach((member) => {
+    let myCharacterTile = document.createElement("div");
+    myCharacterTile.setAttribute("id", "myCharacterTile");
+    myCharacterTile.setAttribute("class", "character-tile agent-tile");
+
+    let charcterImgTag = document.createElement("img");
+    charcterImgTag.setAttribute("src", member.image);
+
+    let characterPTag = document.createElement("p");
+    characterPTag.textContent = member.name;
+
+    myCharacterTile.appendChild(charcterImgTag);
+    myCharacterTile.appendChild(characterPTag);
+    teamContainer.appendChild(myCharacterTile);
+  });
+}
 
 // function for progress load
 function load() {
@@ -605,5 +663,3 @@ function load() {
     }
   });
 }
-
-console.log(localStorage);
