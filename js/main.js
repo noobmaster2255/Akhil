@@ -88,7 +88,7 @@ function startGame() {
 }
 
 //screen 2 team buttons
-if (currentPage == "/Akhil/team.html") {
+if (currentPage == "/team.html") {
   selectTeamButton("teamButtonContainer");
 }
 
@@ -118,7 +118,7 @@ function selectTeamButton(containerId) {
   buttonContainer.style.display = "flex";
 }
 let agentsContainer;
-if (currentPage == "/Akhil/agents.html") {
+if (currentPage == "/agents.html") {
   agentsContainer = document.getElementById("agentsContainer");
   let selectedTeamId = localStorage.getItem("lastClickedButtonId");
   selectedTeam(selectedTeamId);
@@ -222,7 +222,7 @@ function saveCharacterName() {
   });
 }
 
-if (currentPage == "/Akhil/weapons.html") {
+if (currentPage == "/weapons.html") {
   let displyBalance = document.getElementById("displyBalance");
   displyBalance.textContent = balance;
   weaponCategory();
@@ -491,7 +491,7 @@ function continueToNextPage(page) {
     }, 1000);
   });
 }
-if (currentPage == "/Akhil/overview.html") {
+if (currentPage == "/overview.html") {
   let characterNameHeading = document.getElementById("characterNameHeading");
   characterNameHeading.textContent = localStorage.getItem("characterName");
 
@@ -603,25 +603,24 @@ function createTeam() {
   }
 }
 
-const randomAgents = [];
-let filteredAgents = JSON.parse(localStorage.getItem("filteredAgents"));
-const numAgents = filteredAgents.length;
+if (currentPage == "/teamOverview.html") {
+  const randomAgents = [];
+  let filteredAgents = JSON.parse(localStorage.getItem("filteredAgents"));
+  const numAgents = filteredAgents.length;
 
-while (randomAgents.length < 3) {
-  let randomIndex = Math.floor(Math.random() * numAgents);
-  let randomAgent = filteredAgents[randomIndex];
+  while (randomAgents.length < 3) {
+    let randomIndex = Math.floor(Math.random() * numAgents);
+    let randomAgent = filteredAgents[randomIndex];
 
-  if (!randomAgents.includes(randomAgent)) {
-    randomAgents.push(randomAgent);
+    if (!randomAgents.includes(randomAgent)) {
+      randomAgents.push(randomAgent);
+    }
   }
-}
-let myAgent = agents.find(
-  (agent) => agent.id === localStorage.getItem("agentId")
-);
-myAgent.name = localStorage.getItem("characterName");
-randomAgents.push(myAgent);
-
-if (currentPage == "/Akhil/teamOverview.html") {
+  let myAgent = agents.find(
+    (agent) => agent.id === localStorage.getItem("agentId")
+  );
+  myAgent.name = localStorage.getItem("characterName");
+  randomAgents.push(myAgent);
   let teamContainer = document.getElementById("characterContainer");
   let characterNameHeading = document.getElementById("characterNameHeading");
   characterNameHeading.textContent = localStorage.getItem("teamName");

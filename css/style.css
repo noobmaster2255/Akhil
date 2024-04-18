@@ -28,10 +28,7 @@
 
 /*  */
 body {
-    /* background-image: url(/Akhil/assets/csgo2.jpg), url(/Akhil/assets/bg2.jpg); */
-    /* background-image: url(/Akhil/assets/bg2.jpg); */
-    background-image: url(/Akhil/assets/bg1.jpg);
-    /* background-image: url(/Akhil/assets/csgo1.jpg); */
+    background-image: url(/assets/bg1.jpg), url(/assets/bg2.jpg);
 
     object-fit: cover;
     background-repeat: no-repeat;
